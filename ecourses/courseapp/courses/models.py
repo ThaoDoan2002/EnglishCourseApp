@@ -1,12 +1,19 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from ckeditor.fields import RichTextField
 from cloudinary.models import CloudinaryField
+from .validators import file_size
 
 
 class User(AbstractUser):
-    avatar = CloudinaryField('avatar', null=True)
+    avatar = CloudinaryField('avatar', null=True, blank=True)
+    is_teacher = models.BooleanField(default=False)
 
+
+class Category(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
 
 
 class BaseModel(models.Model):
@@ -18,33 +25,26 @@ class BaseModel(models.Model):
         abstract = True
 
 
-class Category(BaseModel):
-    name = models.CharField(max_length=50, null=False)
+class Course(BaseModel):
+    name = models.CharField(max_length=255, null=False, unique=True)
+    description = models.TextField(null=True,blank=True, max_length=255)
+    thumbnail = CloudinaryField('thumbnail', null=True)
+    price = models.IntegerField()
+    category = models.ForeignKey(Category, on_delete=models.RESTRICT)
+    lesson_number = models.IntegerField(null=True)
+    video_length = models.IntegerField(null=True)
+    teacher = models.ForeignKey(User, on_delete=models.RESTRICT)
+
 
     def __str__(self):
         return self.name
 
 
-class Course(BaseModel):
-    subject = models.CharField(max_length=255, null=False)
-    description = RichTextField()
-    image = models.CharField(max_length=100)
-    category = models.ForeignKey(Category, on_delete=models.RESTRICT, related_query_name='courses')
-    tags = models.ManyToManyField('Tag')
-
-    def __str__(self):
-        return self.subject
-
-    class Meta:
-        unique_together = ('subject', 'category')
-
-
 class Lesson(BaseModel):
     subject = models.CharField(max_length=255, null=False)
-    content = RichTextField()
-    image = models.CharField(max_length=100)
+    thumbnail = CloudinaryField('thumbnail', null=True)
+    description = models.TextField(null=True, blank=True, max_length=255)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    tags = models.ManyToManyField('Tag')
 
     class Meta:
         unique_together = ('subject', 'course')
@@ -53,8 +53,12 @@ class Lesson(BaseModel):
         return self.subject
 
 
-class Tag(BaseModel):
-    name = models.CharField(max_length=50, unique=True)
+class Video(BaseModel):
+    name = models.CharField(max_length=255, null=False, unique=True)
+    thumbnail = CloudinaryField('thumbnail', null=True)
+    url = models.FileField(upload_to='courses/%Y/%m',validators=[file_size], null=True, blank=True)
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, null=True)
+
 
     def __str__(self):
         return self.name

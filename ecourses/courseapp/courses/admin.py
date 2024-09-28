@@ -1,23 +1,19 @@
 from django.contrib import admin
-from .models import Category,Course, Lesson, Tag
-from django import forms
-from ckeditor_uploader.widgets import CKEditorUploadingWidget
+from .models import Category,Course, Lesson, User, Video
 
 
 
-class CourseForm(forms.ModelForm):
-    description = forms.CharField(widget=CKEditorUploadingWidget)
-    class Meta:
-        model = Course
-        fields = '__all__'
-
-
-class TagInlineAdmin(admin.StackedInline):
-    model = Course.tags.through
 
 class CourseAdmin(admin.ModelAdmin):
-    form = CourseForm
-    inlines = [TagInlineAdmin]
+    # Lọc danh sách người dùng trong trường teacher chỉ hiện người dùng có is_teacher=True
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "teacher":
+            kwargs["queryset"] = User.objects.filter(is_teacher=True)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
+class UserAdmin(admin.ModelAdmin):
+    list_display = ['pk','username']
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -29,5 +25,6 @@ class CategoryAdmin(admin.ModelAdmin):
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Lesson)
-admin.site.register(Tag)
+admin.site.register(User,UserAdmin)
+admin.site.register(Video)
 

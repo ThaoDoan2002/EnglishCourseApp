@@ -1,4 +1,4 @@
-from courses.models import Category, Course, Tag, Lesson, User
+from courses.models import Category, Course, Lesson, User, Video
 from rest_framework import serializers
 
 
@@ -8,15 +8,14 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class TagSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Tag
-        fields = ['id', 'name']
-
 class CourseSerializer(serializers.ModelSerializer):
-    tags = TagSerializer(many=True)
     class Meta:
         model = Course
+        fields = '__all__'
+
+class VideoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Video
         fields = '__all__'
 
 
@@ -40,7 +39,7 @@ class UserSerializer(serializers.ModelSerializer):
         data = validated_data.copy()
 
         user = User(**data)
-        user.set_password(data['password'])
+        user.set_password(data['password']) #băm mật khẩu
         user.save()
 
         return user

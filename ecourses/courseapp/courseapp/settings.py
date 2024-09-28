@@ -24,7 +24,6 @@ SECRET_KEY = 'django-insecure-4bl)oe$u0h$c!-*t9isaza9co#2e+ta&^vrz(zzt=!30y8(sw_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -43,10 +42,13 @@ INSTALLED_APPS = [
     'drf_yasg',
     'cloudinary',
     'oauth2_provider',
+    'corsheaders',
 ]
 
-CLIENT_ID = 'b9TXHshBE4bqMkea1lHLc19GNlkCsIRBmj3abwgq'
-CLIENT_SECRET = 'tI1S59zezRalEFwK1JNm8fKuqwmPM73DS3gfPdLqLsBiW4y0UPmq1WJrUYsjI3G8ihjiOlojEm2H4NRycg1z9YwX3PnV3mkLTCquIM0MNwEy93a377IcW5z04K13YI4D'
+CORS_ALLOW_ALL_ORIGINS = True
+
+CLIENT_ID = 'wo6xNMHb2lvJL91do5WPM4h58kKxsHq070g2WlGi'
+CLIENT_SECRET = 'yAAEJgn0zdF5VA9EbYpK3YnFYhkHZlBvVEkVC1fDywq9Sn9FSTXB3kDlUjwLDAkjfVVHLMkVEQaJSmlpFrx96ms9TTcSGCN54xdgfYRvyQn6pZXBm9weDMOvQgTpMvOI'
 
 REST_FRAMEWORK = {
 
@@ -54,6 +56,8 @@ REST_FRAMEWORK = {
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
     )
 }
+
+FILE_UPLOAD_MAX_MEMORY_SIZE = 524288000
 
 import cloudinary
 
@@ -69,6 +73,7 @@ MEDIA_ROOT = '%s/courses/static/' % BASE_DIR
 CKEDITOR_UPLOAD_PATH = "ckeditor/images/"
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -78,6 +83,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
+
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost','192.168.56.1']
 
 import pymysql
 
@@ -154,9 +161,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MAILCHIMP_API_KEY = '1231f386e08b1f794e456ba3b9e9aef4-us14'
+MAILCHIMP_LIST_ID = '3746e14607'
+MAILCHIMP_SERVER_PREFIX = 'us14'
