@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,7 +24,6 @@ SECRET_KEY = 'django-insecure-4bl)oe$u0h$c!-*t9isaza9co#2e+ta&^vrz(zzt=!30y8(sw_
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 
 # Application definition
 
@@ -43,12 +43,16 @@ INSTALLED_APPS = [
     'cloudinary',
     'oauth2_provider',
     'corsheaders',
+    'storages',
+    'import_export',
 ]
+MY_HOST = "https://b60b-14-161-16-3.ngrok-free.app"
 
 CORS_ALLOW_ALL_ORIGINS = True
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.61.1', 'b60b-14-161-16-3.ngrok-free.app']
 
-CLIENT_ID = 'wo6xNMHb2lvJL91do5WPM4h58kKxsHq070g2WlGi'
-CLIENT_SECRET = 'yAAEJgn0zdF5VA9EbYpK3YnFYhkHZlBvVEkVC1fDywq9Sn9FSTXB3kDlUjwLDAkjfVVHLMkVEQaJSmlpFrx96ms9TTcSGCN54xdgfYRvyQn6pZXBm9weDMOvQgTpMvOI'
+CLIENT_ID = 'OnNASdcLjUQKr7m2r4Z8o5eHJqnsgaAMTWtVB3eW'
+CLIENT_SECRET = 'ucdM4hAIcDL2bXKGz0hPwwRPN3Op6V6ysD4pAXG6Zrs4ZrzKKbdTujfUM79QFOOhafTCnxQLX0OtEJg8z6ZRHrp6q3x21kRxISD3ehHt5OFPf5fGosQT2ixerdzckdkq'
 
 REST_FRAMEWORK = {
 
@@ -84,8 +88,6 @@ MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost','192.168.56.1']
-
 import pymysql
 
 pymysql.install_as_MySQLdb()
@@ -95,7 +97,9 @@ ROOT_URLCONF = 'courseapp.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -125,6 +129,7 @@ DATABASES = {
 
 INTERNAL_IPS = [
     "127.0.0.1",
+    "192.168.56.1",
 ]
 
 AUTH_USER_MODEL = 'courses.User'
@@ -163,11 +168,55 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS = [
+    BASE_DIR / 'static'
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MAILCHIMP_API_KEY = '1231f386e08b1f794e456ba3b9e9aef4-us14'
+MAILCHIMP_API_KEY = '87b2b9cf118cf3cfc4cf91e98e004562-us14'
 MAILCHIMP_LIST_ID = '3746e14607'
 MAILCHIMP_SERVER_PREFIX = 'us14'
+
+
+
+# AWS_ACCESS_KEY_ID = '-----'
+# AWS_SECRET_ACCESS_KEY = '------'
+AWS_STORAGE_BUCKET_NAME = 'englishcourseapp'
+AWS_S3_SIGNATURE_NAME = 's3v4'
+AWS_S3_REGION_NAME = 'ap-southeast-2'
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+AWS_S3_VERITY = True
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/'
+
+CELERY_BROKER_URL = 'redis://default:7lOh3tUWC47tqithCOXpGZE1NHb4I4WK@redis-19993.c114.us-east-1-4.ec2.redns.redis-cloud.com:19993/0'
+CELERY_RESULT_BACKEND = 'redis://default:7lOh3tUWC47tqithCOXpGZE1NHb4I4WK@redis-19993.c114.us-east-1-4.ec2.redns.redis-cloud.com:19993/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+# Tắt việc lưu file trong bộ nhớ, ép sử dụng TemporaryFileUploadHandler
+FILE_UPLOAD_MAX_MEMORY_SIZE = 0
+
+STRIPE_SECRET_KEY = 'sk_test_51Q6SuXGUqM1e0NzrfYLAqLCRvht4fCG7JIc87Iv4Segi0EBzyC8tncF3TxsvRTMDuHIGkhEQWZlu1mWZrJl5w2Dk00uNZ73dbk'
+STRIPE_PUBLIC_KEY = 'pk_test_51Q6SuXGUqM1e0NzrDuLIm2x41ha6lvbnM42gmg2nTHLxki8yvfgKD8x5TxbyLXiWUY1cmj8n1lG0ymvE7FJjy6tX00lOpJDEij'
+STRIPE_WEBHOOK_SECRET = "whsec_EwOf0QoSYwhGlgVJMCLsduR1hSnJzyAw"
+
+# Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # SMTP server của Gmail
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'doanthithao20022003@gmail.com'  # Thay bằng email của bạn
+EMAIL_HOST_PASSWORD = 'ehbftdvdpqlacobp'
+# Mật khẩu ứng dụng hoặc mật khẩu tài khoản ehbf tdvd pqla cobp
+
+# Default email address to send from
+DEFAULT_FROM_EMAIL = 'doanthithao20022003@gmail.com'
+# Admin email for notifications
+ADMIN_EMAIL = '2151013090thao@ou.edu.vn'  # Thay bằng email của admin

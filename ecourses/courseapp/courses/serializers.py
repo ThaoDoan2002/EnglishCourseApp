@@ -1,5 +1,6 @@
-from courses.models import Category, Course, Lesson, User, Video
+from courses.models import Category, Course, Lesson, User, Video, Payment
 from rest_framework import serializers
+
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -9,9 +10,19 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class CourseSerializer(serializers.ModelSerializer):
+    payment_status = serializers.SerializerMethodField()
+
     class Meta:
         model = Course
-        fields = '__all__'
+        fields = ['id', 'name', 'description', 'thumbnail', 'price', 'category', 'teacher', 'payment_status']
+
+    def get_payment_status(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            # Kiểm tra nếu user đã thanh toán cho khóa học này
+            return Payment.objects.filter(user=user, course=obj, status=True).exists()
+        return False
+
 
 class VideoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,17 +31,25 @@ class VideoSerializer(serializers.ModelSerializer):
 
 
 class LessonSerializer(serializers.ModelSerializer):
+    payment_status = serializers.SerializerMethodField()
     class Meta:
         model = Lesson
-        fields = '__all__'
+        fields = ['id', 'subject', 'thumbnail', 'description', 'course', 'payment_status']
+
+    def get_payment_status(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            # Kiểm tra nếu user đã thanh toán cho khóa học này
+            return Payment.objects.filter(user=user, course=obj.course, status=True).exists()
+        return False
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username', 'password', 'email','avatar']
+        fields = ['first_name', 'last_name', 'username', 'password', 'email', 'avatar', 'phone']
         extra_kwargs = {
-            'password':{
+            'password': {
                 'write_only': True
             }
         }
@@ -39,10 +58,14 @@ class UserSerializer(serializers.ModelSerializer):
         data = validated_data.copy()
 
         user = User(**data)
-        user.set_password(data['password']) #băm mật khẩu
+        user.set_password(data['password'])  #băm mật khẩu
         user.save()
 
         return user
 
 
 
+class PaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = '__all__'
